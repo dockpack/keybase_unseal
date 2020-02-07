@@ -1,0 +1,29 @@
+---
+# tasks_include for keybase_unseal by @bbaassssiiee
+
+- name: save Vault credentials as pretty JSON
+  delegate_to: localhost
+  become: false
+  no_log: true
+  when: "'{{ check_result.status }}' == '501'"
+  copy:
+    dest: "{{ vault_credentials }}"
+    content: "{{ inited.stdout|from_json|to_nice_json }}"
+    mode: 0600
+  register: save_json
+  tags:
+    - init
+
+- name: encrypt pretty JSON with ansible-vault
+  delegate_to: localhost
+  become: false
+  no_log: true
+  when: "'{{ check_result.status }}' == '501'"
+  environment:
+    # yamllint disable-line rule:line-length
+    ANSIBLE_VAULT_PASSWORD_FILE: "{{ lookup('env','ANSIBLE_VAULT_PASSWORD_FILE') }}"
+  command: "ansible-vault encrypt {{ vault_credentials }}"
+  tags:
+    - init
+
+...

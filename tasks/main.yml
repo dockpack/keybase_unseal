@@ -1,0 +1,64 @@
+---
+# tasks file for keybase_unseal by @bbaassssiiee
+
+- name: Assert
+  assert:
+    that: lookup('env','ANSIBLE_VAULT_PASSWORD_FILE')|length != 0
+
+- name: Vault API reachable?
+  include_tasks: vault_resttest.yml
+  tags:
+    - check_vault
+    - init
+
+- name: Initialize Vault with Keybase Shamir Secret Sharing
+  when: not auto_unseal
+  include_tasks: shamir.yml
+  tags:
+    - init
+    - shamir
+
+- name: Initialize Vault with Keybase Teamsharing
+  when: auto_unseal|bool
+  include_tasks: teamshare.yml
+  tags:
+    - init
+
+- name: Share encrypted vault.json with Keybase team
+  include_tasks: kbfs.yml
+  tags:
+    - init
+    - shamir
+
+- name: Vault API reachable?
+  include_tasks: vault_resttest.yml
+  tags:
+    - init
+    - unseal
+    - seal
+
+- name: Load encrypted Vault credentials
+  no_log: true
+  include_vars: "{{ vault_credentials }}"
+  tags:
+    - unseal
+    - seal
+
+- name: Unseal Vault
+  when: auto_unseal|bool
+  include_tasks: auto_unseal.yml
+  tags:
+    - unseal
+
+- name: 'Seal Vault with -e seal=true'
+  when: seal is defined
+  include_tasks: seal.yml
+  tags:
+    - seal
+
+- name: Configure audit log
+  include_tasks: audit.yml
+  tags:
+    - audit
+
+...

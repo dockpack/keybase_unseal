@@ -1,0 +1,31 @@
+---
+# defaults file for keybase_unseal
+
+auto_unseal: false
+
+keybase_team: 'dockpack'
+
+# This should be a set of trusted users in the Keybase team
+kbt:
+  - basmeijer
+  - fbezema
+  - ksatirli
+  - ferhaty
+
+# This is the number of unseal keys generated
+# WARNING: adjust tasks/shamir.yml line 17 if changed
+key_shares: 4
+
+# The number of trustees required to unseal the vault
+key_threshold: 2
+
+# This is the path where the encrypted JSON is shared.
+vault_credentials: "/Volumes/Keybase/team/{{ keybase_team }}/vault.json"
+
+# see brianshumate.vault
+vault_port: 8200
+vault_tls_ca_file: ca.crt
+# yamllint disable-line rule:line-length
+vault_tls_config_path: "{{ lookup('env','VAULT_TLS_DIR') | default('/etc/vault/tls', true) }}"
+
+...
