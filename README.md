@@ -5,7 +5,7 @@ This Ansible role for initializing and unsealing Hashicorp Vault creates one
 encrypted json file for your team Keybase team in KBFS. Default is a macOS path.
 
 ```
-vault_credentials: '/Volumes/Keybase/team/{{ keybase_team }}/vault.json'
+vault_credentials: '/keybase/team/{{ keybase_team }}/vault.json'
 ```
 
 You can share the passphrase on KBFS, or on your jumphost, but for encryption
