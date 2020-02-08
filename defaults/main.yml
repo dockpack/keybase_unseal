@@ -1,7 +1,7 @@
 ---
 # defaults file for keybase_unseal
 
-auto_unseal: false
+auto_unseal: true
 
 keybase_team: 'dockpack'
 
