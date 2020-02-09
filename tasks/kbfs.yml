@@ -3,6 +3,7 @@
 
 - name: save Vault credentials as pretty JSON
   delegate_to: localhost
+  run_once: true
   become: false
   no_log: true
   when: "'{{ check_result.status }}' == '501'"
@@ -16,6 +17,7 @@
 
 - name: encrypt pretty JSON with ansible-vault
   delegate_to: localhost
+  run_once: true
   become: false
   no_log: true
   when: "'{{ check_result.status }}' == '501'"
