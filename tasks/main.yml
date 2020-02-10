@@ -37,6 +37,14 @@
     - unseal
     - seal
 
+- name: Display credential path
+  debug:
+    msg: "vault_credentials: {{ vault_credentials }}"
+  tags:
+    - init
+    - unseal
+    - seal
+
 - name: Load encrypted Vault credentials
   no_log: true
   include_vars: "{{ vault_credentials }}"
