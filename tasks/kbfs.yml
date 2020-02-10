@@ -2,8 +2,8 @@
 # tasks_include for keybase_unseal by @bbaassssiiee
 
 - name: Display vault_credential path
-	debug:
-		msg: "vault_credentials: {{ vault_credentials }}"
+  debug:
+    msg: "vault_credentials: {{ vault_credentials }}"
 
 - name: save Vault credentials as pretty JSON
   delegate_to: localhost
