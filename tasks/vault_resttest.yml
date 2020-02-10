@@ -11,13 +11,6 @@
     validate_certs: "{{ validate_certs_during_api_reachable_check | bool }}"
     url: "{{ vault_proto }}://{{ vault_addr }}:{{ vault_port }}/v1/sys/health"
     method: GET
-    # 200 if initialized, unsealed, and active
-    # 429 if unsealed and standby
-    # 472 if data recovery mode replication secondary and active
-    # 473 if performance standby
-    # 501 if not initialized
-    # 503 if sealed
-    # See: https://www.vaultproject.io/api/system/health.html
     status_code: 200, 503, 200, 429, 473, 501, 503
     body_format: json
   register: check_result
@@ -31,11 +24,27 @@
     - unseal
     - seal
 
+- name: Set vault_status
+  set_fact:
+    vault_status: "{{ check_result.status }}"
+  tags:
+    - init
+    - unseal
+    - seal
+
+- name: Display vault_status
+  debug:
+    msg: "vault_status: {{ vault_status }}"
+  tags:
+    - init
+    - unseal
+    - seal
+
 - name: Vault status
   debug:
     msg: "Vault is {{ item.value }}"
   loop: "{{ lookup('dict', vault_http_status) }}"
-  when: "'{{ check_result.status }}' in item.key"
+  when: vault_status in item.key
   tags:
     - check_vault
     - init

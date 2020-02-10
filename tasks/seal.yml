@@ -2,8 +2,7 @@
 # tasks_include for keybase_unseal by @bbaassssiiee
 
 - name: 'seal Hashicorp Vault with tags=seal -e seal=true'
-  delegate_to: "{{ groups.vault_instances[0] }}"
-  run_once: true
+#  delegate_to: "{{ groups.vault_instances[0] }}"
   no_log: true
   when: seal is defined
   environment:

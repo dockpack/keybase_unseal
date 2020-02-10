@@ -6,7 +6,7 @@
   run_once: true
   become: false
   no_log: true
-  when: "'{{ check_result.status }}' == '501'"
+  when: vault_status == '501'
   copy:
     dest: "{{ vault_credentials }}"
     content: "{{ inited.stdout|from_json|to_nice_json }}"
@@ -20,7 +20,7 @@
   run_once: true
   become: false
   no_log: true
-  when: "'{{ check_result.status }}' == '501'"
+  when: vault_status == '501'
   environment:
     # yamllint disable-line rule:line-length
     ANSIBLE_VAULT_PASSWORD_FILE: "{{ lookup('env','ANSIBLE_VAULT_PASSWORD_FILE') }}"

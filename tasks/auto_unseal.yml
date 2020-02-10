@@ -2,9 +2,8 @@
 # tasks_include for keybase_unseal by @bbaassssiiee
 
 - name: 'unseal Hashicorp Vault with tags=unseal'
-  run_once: true
   no_log: true
-  when: "'{{ check_result.status }}' == '503'"
+  when: vault_status == '503'
   environment:
     VAULT_ADDR: "https://{{ groups.vault_instances[0] }}:{{ vault_port }}"
     VAULT_CACERT: "{{ vault_tls_config_path }}/{{ vault_tls_ca_file }}"
