@@ -2,10 +2,11 @@
 # defaults file for keybase_unseal
 
 auto_unseal: true
-
+shamir: true
 keybase_team: 'dockpack'
 
 # This should be a set of trusted users in the Keybase team
+# export KBT_INDEX to your index in this list, i.e. 1 for fbezema.
 kbt:
   - basmeijer
   - fbezema

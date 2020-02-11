@@ -12,14 +12,14 @@
     - init
 
 - name: Initialize Vault with Keybase Shamir Secret Sharing
-  when: not auto_unseal
+  when: shamir|bool
   include_tasks: shamir.yml
   tags:
     - init
     - shamir
 
 - name: Initialize Vault with Keybase Teamsharing
-  when: auto_unseal|bool
+  when: not shamir
   include_tasks: teamshare.yml
   tags:
     - init
@@ -53,7 +53,6 @@
     - seal
 
 - name: Unseal Vault
-  when: auto_unseal|bool
   include_tasks: auto_unseal.yml
   tags:
     - unseal

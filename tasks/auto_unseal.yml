@@ -1,9 +1,9 @@
 ---
 # tasks_include for keybase_unseal by @bbaassssiiee
 
-- name: 'unseal Hashicorp Vault with tags=unseal'
+- name: 'unseal Hashicorp Vault with teamshare unseal'
   no_log: true
-  when: vault_status == '503'
+  when: vault_status == '503' and not shamir
   environment:
     VAULT_ADDR: "https://{{ groups.vault_instances[0] }}:{{ vault_port }}"
     VAULT_CACERT: "{{ vault_tls_config_path }}/{{ vault_tls_ca_file }}"
@@ -12,4 +12,41 @@
   tags:
     - unseal
 
+- name: 'set kbt_index from env, rang in array of keybase team list kbt.'
+  when: vault_status == '503' and shamir|bool
+  delegate_to: localhost
+  run_once: true
+  set_fact:
+    kbt_index: "{{ lookup('env','KBT_INDEX') }}"
+  tags:
+    - unseal
+    - shamir
+
+- name: 'decrypt unseal key based on kbt_index'
+  when: vault_status == '503' and shamir|bool
+  delegate_to: localhost
+  become: false
+  run_once: true
+  no_log: true
+  shell: |
+    set -o pipefail ;\
+    ansible-vault view /keybase/team/{{ keybase_team }}/vault.json \
+    | jq -r .unseal_keys_b64[{{ kbt_index }}] \
+    | base64 --decode \
+    | gpg -d
+  register: unseal_key
+  tags:
+    - unseal
+    - shamir
+
+- name: 'unseal Hashicorp Vault with tags=unseal'
+  when: vault_status == '503' and shamir|bool
+  no_log: true
+  environment:
+    VAULT_ADDR: "https://{{ groups.vault_instances[0] }}:{{ vault_port }}"
+    VAULT_CACERT: "{{ vault_tls_config_path }}/{{ vault_tls_ca_file }}"
+  command: "vault operator unseal {{ unseal_key.stdout }}"
+  tags:
+    - unseal
+    - shamir
 ...
