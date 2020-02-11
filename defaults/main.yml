@@ -1,9 +1,11 @@
 ---
 # defaults file for keybase_unseal
 
-auto_unseal: true
+# https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing
 shamir: true
-keybase_team: 'dockpack'
+
+# create your own team on https://keybase.io
+keybase_team: 'dockpack.vault'
 
 # This should be a set of trusted users in the Keybase team
 # export KBT_INDEX to your index in this list, i.e. 1 for fbezema.
