@@ -1,6 +1,7 @@
 ---
 # tasks_include for keybase_unseal by @bbaassssiiee
 
+# teamshare unseal (not shamir)
 - name: 'unseal Hashicorp Vault with teamshare unseal'
   no_log: true
   when: vault_status == '503' and not shamir
@@ -22,6 +23,7 @@
     - unseal
     - shamir
 
+# shamir unseal
 - name: 'decrypt unseal key based on kbt_index'
   when: vault_status == '503' and shamir|bool
   delegate_to: localhost
