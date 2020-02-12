@@ -10,7 +10,7 @@ You can create a Keybase account and a team with sub-team on:
 Requirements
 ------------
 
-Create users on [https://keybase.io](https://keybase.io) and add define
+Create users on [https://keybase.io](https://keybase.io) and define
 `keybase_team:` in group_vars. Let the users install the Keybase.app on
 multiple personal devices. Let them add proof for their online identities, so
 they have [Skin in the game](https://en.wikipedia.org/wiki/Skin_in_the_Game_(book)).
@@ -26,15 +26,52 @@ Fun fact: **Shamir** is the S in RSA, he is a well-known cryptographer.
 
 Secret-Zero & Shamir
 ====================
+Shamir Secret Sharing is an algorithm in cryptography, backed by mathematics
+ where no single person should be able to hold enough keys to
+the Vault kindom. A group of trustees is each given an individual unseal key by the
+dealer. A preset treshold of key holders is needed to unseal the Vault.
+
+The essential idea of Adi Shamir's threshold scheme is that 2 points are sufficient
+to define a line, 3 points are sufficient to define a parabola, 4 points to define
+a cubic curve and so forth.
+
+This ansible role automates the dealer.
+
+Sharing Secret-Zero
+===================
+
 Keybase KBFS creates an encrypted shared filesystem for your team. This is used
 to store 2 critical files: `vault.json` and `vault.pass`. The json file is the
-output of `vault operator init ...` with PGP encrypted unseal keys.
+same as the output of `vault operator init ...`: having PGP encrypted unseal keys,
+each one encrypted with the public key of one of the team members. Each team
+member is only authorized to their part, they shoudl team up to unseal Vault. i
+This four-eyes, six-eyes, or n-eyes principle governs the capability to unseal
+Hashicorp Vault. And that is a valuable principle.
+
+Therefore it is a small feat to encrypt this vault.json file with ansible-vault, and
+another small feat to have this shared only with the trustees in a Keybase subteam.
+The real value lies in the lockdown of individual unseal keys over a team that can work
+remotely, and in different shifts or timezones, because the ideal automation does
+not store the unseal keys unencrypted principle. Moreover the ideal automation should
+preserve Shamir Secret Sharing at rest.
+
+At the moment there are 2 ways to deal with the unseal keys, the `shamir` boolean variable
+is used to drive the playbook. When it is true it takes a couple of people to unseal the
+vault. When it is false the playbook can simply iterate over the unsencrypted unseal keys
+to unseal the vault and do further automation.
+
+TODO: I'd like to change the implementation a bit as to initialize with known unseal keyas,
+that are encrypted to each keybase_team member's PGP key after an unseal, because that
+will allow full provisioning at cluster creation time.
+
+Role variables
+==============
 
 ```
 vault_credentials: '/keybase/team/{{ keybase_team }}/vault.json'
 ```
 
-The `vault.pass` file is stored there for remote work.
+The `vault.pass` file is stored here for remote work.
 
 ```
 export KEYBASE_TEAM=dockpack.vault
