@@ -1,0 +1,15 @@
+{
+    "recovery_keys_b64": [],
+    "recovery_keys_hex": [],
+    "recovery_keys_shares": "{{ json.ansible_facts.recovery_keys_shares }}",
+    "recovery_keys_threshold": "{{ json.ansible_facts.recovery_keys_threshold }}",
+    "root_token": "{{ json.ansible_facts.root_token }}",
+    "unseal_keys_b64":
+      {{ pgp_unseal_keys_b64 }}
+    ,
+    "unseal_keys_hex":
+      {{ pgp_unseal_keys_hex }}
+    ,
+    "unseal_shares": {{ json.ansible_facts.unseal_shares }},
+    "unseal_threshold": {{ json.ansible_facts.unseal_threshold }}
+}
