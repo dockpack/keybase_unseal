@@ -1,0 +1,69 @@
+#!/usr/bin/env ansible-playbook -e python_interpreter=/usr/local/bin/python3
+---
+# This converts vault.json unencrypted shards to Keybase encrypted.
+# This enforces the Shamir Secret Sharing, after automating the unsealed Vault.
+
+- name: Encrypt each vault.json unseal key to a Keybase Team member
+  hosts: localhost
+  connection: local
+  become: false
+  gather_facts: false
+
+  vars_files:
+    - defaults/main.yml
+
+  tasks:
+
+    - name: Load encrypted Vault credentials
+      no_log: true
+      include_vars: "{{ vault_credentials }}"
+      register: json
+
+    - name: Create arrays
+      set_fact:
+        pgp_unseal_keys_b64: []
+        pgp_unseal_keys_hex: []
+
+    - name: Encrypt unseal keys and encode base64
+      shell: |
+        set -o pipefail; \
+        keybase pgp encrypt -m {{ item.0 }} -b {{ item.1 }} | base64
+      with_together:
+        - "{{ json.ansible_facts.unseal_keys_hex }}"
+        - "{{ kbt }}"
+      register: b64
+      no_log: true
+      changed_when: false
+
+    - name: Encrypt unseal keys and encode hex
+      shell: |
+        set -o pipefail; \
+        keybase pgp encrypt -m {{ item.0 }} -b {{ item.1 }} | xxd -p
+      with_together:
+        - "{{ json.ansible_facts.unseal_keys_hex }}"
+        - "{{ kbt }}"
+      register: hex
+      no_log: true
+      changed_when: false
+
+    - name: Add to arrays
+      set_fact:
+        pgp_unseal_keys_b64: "{{ pgp_unseal_keys_b64 + [ item.0.stdout ] }}"
+        pgp_unseal_keys_hex: "{{ pgp_unseal_keys_hex + [ item.1.stdout ] }}"
+      with_together:
+        - "{{ b64.results }}"
+        - "{{ hex.results }}"
+      no_log: true
+
+    - name: Write vault.json file in KBFS
+      copy:
+        content: "{{ lookup('template', 'templates/vault.j2') | to_nice_json }}"
+        dest: "{{ vault_credentials }}"
+
+    - name: Encrypt vault.json with ansible-vault
+      no_log: true
+      environment:
+        ANSIBLE_VAULT_PASSWORD_FILE: "{{ ANSIBLE_VAULT_PASSWORD_FILE }}"
+      command: "ansible-vault encrypt {{ vault_credentials }}"
+      changed_when: true
+...
