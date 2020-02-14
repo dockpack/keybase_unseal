@@ -2,7 +2,10 @@
 # defaults file for keybase_unseal
 
 # https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing
-shamir: true
+shamir: false
+
+# line-length hack
+ANSIBLE_VAULT_PASSWORD_FILE: "{{ lookup('env','ANSIBLE_VAULT_PASSWORD_FILE') }}"
 
 # create your own team on https://keybase.io
 keybase_team: 'dockpack.vault'
