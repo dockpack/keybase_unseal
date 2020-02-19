@@ -26,7 +26,7 @@ key_shares: 4
 key_threshold: 2
 
 # This is the path where the encrypted JSON is shared.
-vault_credentials: "/keybase/team/{{ keybase_team }}/vault.json"
+vault_credentials: "/Volumes/Keybase/team/{{ keybase_team }}/vault.json"
 
 # see brianshumate.vault
 vault_port: 8200
