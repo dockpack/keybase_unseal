@@ -32,7 +32,7 @@
   no_log: true
   shell: |
     set -o pipefail ;\
-    ansible-vault view /keybase/team/{{ keybase_team }}/vault.json \
+    ansible-vault view {{ vault_credentials }} \
     | jq -r .unseal_keys_b64[{{ kbt_index }}] \
     | base64 --decode \
     | gpg -d
